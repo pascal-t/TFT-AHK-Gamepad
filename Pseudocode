@@ -1,0 +1,111 @@
+//Store Points in Arrays, Order will be irrelevant, 
+//because we will try to jump to the closest point in a direction when the DPad is pressed
+//Switching Domains will however move to the first point in a Domain
+//Display coordinates:
+//0,0---> x
+//|
+//|
+//V y
+
+Board = Array [] {
+  Array [] { x,y },
+  Array [] { x,y },
+  ...
+}
+Bench = Array [] {
+  Array [] { x,y },
+  Array [] { x,y },
+  ...
+}
+Shop = Array [] {
+  Array [] { x,y },
+  Array [] { x,y },
+  ...
+}
+Items = Array [] {
+  Array [] { x,y },
+  Array [] { x,y },
+  ...
+}
+
+//Store the domains in an array, store the current domain, becasue there will be buttons to switch domains
+currentDomain = 0;
+Domains = Array [] {
+  Board, Bench, Shop, Items
+}
+
+setCurrentDomain (domain) {
+  currentDomain = domain;
+}
+
+getCurrentDomain () {
+  return domain;
+}
+
+//Supply 1, or -1 as directions
+switchDomain(direction) {
+  domain = (getCurrentDomain() + direction) % Domains.size
+  setCurrentDomain(domain)
+  move(Domain[domain][0][x], Domain[domain][0][y])
+}
+
+//Supply 1, or -1 as directions
+move(axis, direction) {
+  //I really hope ther is a Point Opject, or Maps
+  //Otherwise we have to map the axis to x = 0 and y = 1
+  currentPoint = Array [] { getCurrentX, getCurrentY }
+  closestPoint //Store new point
+  closestDistance = -1 //save us from recalculating the distance all the time
+  closestDomain //Store new domain, if we do enter a new one
+  
+  for (int d = 0; d < Domains.size; d++) {
+    domain = Domains[d]
+    
+    for (int p = 0; p < Domain.size; p++) {
+      point = Domain[p]
+      
+      //Check if we are moving in the right direction 
+      if (point[axis] - currentPoint[axis] * direction >  0) {
+        distanceX = absolute(point[x] - currentPoint[x]) //remove the sign
+        distanceY = absolute(point[y] - currentPoint[y])
+        
+        //Only move in a 45 degree cone (
+        inCone = false
+        if (axis == x) {
+          inCone = distanceX >= distanceY
+        } else {
+          inCone = distanceY >= distanceX
+        }
+        if (inCone) {
+          distance = sqrt(distanceX ^ 2 + distanceY ^ 2)
+          if (distance < closestDistance) {
+            closestDistance = distance
+            closestPoint = point
+            closestDomain = d
+          }
+        }
+      }
+    }
+  }
+  
+  if (closestDistance > 0) {
+    moveMouse(closestPoint[x], closestPoint[y])
+    setCurrentDomain(closestDomain)
+  }
+}
+
+//Bind Stuff
+//0,0---> x
+//|
+//|
+//V y
+
+DpadUp = move(y, -1)
+DpadDown = move(y, 1)
+DpadLeft = move(x, -1)
+DpadRight = move(x, 1)
+LeftTrigger = moveDomain(-1)
+RightTrigger = moveDomain(1)
+LeftStick = moveMouse
+? = RightClick 
+A = Left Click
