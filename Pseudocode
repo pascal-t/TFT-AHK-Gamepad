@@ -1,4 +1,4 @@
-//Store Points in Arrays, Order will be irrelevant, 
+mirmirmir//Store Points in Arrays, Order will be irrelevant, 
 //because we will try to jump to the closest point in a direction when the DPad is pressed
 //Switching Domains will however move to the first point in a Domain
 //Display coordinates:
@@ -33,6 +33,8 @@ currentDomain = 0;
 Domains = Array [] {
   Board, Bench, Shop, Items
 }
+
+outerCarusellWidth = ?
 
 setCurrentDomain (domain) {
   currentDomain = domain;
@@ -94,6 +96,21 @@ move(axis, direction) {
   }
 }
 
+circularMove(inputStick, autoMove)  {
+  stickX = getX(inputStick)
+  stickY = getY(inputStick)
+  
+  //Implement a deadzone so the mouse won't drift
+  if (stickX > deadzone && stickY > deadzone) {
+    mouseX = (screenWidth / 2) + outerCarusellWidth * (stickX / maxStickX)
+    mouseY = (screenHeight / 2) + outerCarusellWidth * (stickY / maxStickY)
+    moveMouse(mouseX, mouseY)
+    if (autoMove) {
+      rightClick()
+    }
+  }
+}
+
 //Bind Stuff
 //0,0---> x
 //|
@@ -106,6 +123,8 @@ DpadLeft = move(x, -1)
 DpadRight = move(x, 1)
 LeftTrigger = moveDomain(-1)
 RightTrigger = moveDomain(1)
+deadzone = ?
 LeftStick = moveMouse
+RightStick = circularMove("RightStick")
 ? = RightClick 
 A = Left Click
